@@ -1,7 +1,8 @@
 # Movie_review
-# Movie Watchlist & Review Portal (Web Version)
 
-A simple website version of the movie watchlist app.
+Overview
+
+A personal database web app where users can manage movies they want to watch, track what they've already watched, and rate/review them. Users can register an account, maintain their own watchlist, and view simple analytics on their viewing and rating history.
 
 Files
 
