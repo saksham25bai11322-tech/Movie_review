@@ -16,6 +16,8 @@ Both files must be in the same folder to work.
 javac Main.java
 java Main
 
+Or
+Use : https://movie-review-oneoone.vercel.app/
 
 
  Features
