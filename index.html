@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Watchlist &amp; Review Portal</title>
+<style>
+  :root {
+    --blue-pale: #eaf4fb;
+    --blue-light: #cfe8f7;
+    --blue-mid: #6fb3e0;
+    --blue-strong: #2f7ab8;
+    --blue-deep: #1c4a6e;
+    --white: #ffffff;
+    --text: #1c2b36;
+    --text-soft: #5a7284;
+    --danger: #c0554d;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--blue-pale) 0%, var(--white) 320px);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 28px 20px 18px;
+    text-align: center;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--blue-deep);
+  }
+
+  header p {
+    margin: 6px 0 0;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--blue-light);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(47, 122, 184, 0.06);
+  }
+
+  .card h2 {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    color: var(--blue-deep);
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin: 10px 0 4px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--blue-light);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--blue-pale);
+    color: var(--text);
+  }
+
+  textarea { resize: vertical; min-height: 44px; }
+
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--blue-mid);
+    outline-offset: 1px;
+    background: var(--white);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--blue-strong);
+    color: var(--white);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+
+  .btn:hover { background: var(--blue-deep); }
+
+  .btn.secondary {
+    background: var(--blue-pale);
+    color: var(--blue-deep);
+    border: 1px solid var(--blue-light);
+  }
+
+  .btn.secondary:hover { background: var(--blue-light); }
+
+  .btn.danger {
+    background: var(--white);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+
+  .btn.danger:hover { background: #fbeceb; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 140px; }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .tabs button {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--blue-light);
+    background: var(--white);
+    color: var(--blue-deep);
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .tabs button.active {
+    background: var(--blue-strong);
+    color: var(--white);
+    border-color: var(--blue-strong);
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .topbar span { color: var(--text-soft); font-size: 0.9rem; }
+
+  .movie-item {
+    border: 1px solid var(--blue-light);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+    background: var(--blue-pale);
+  }
+
+  .movie-item .title {
+    font-weight: 600;
+    color: var(--blue-deep);
+    font-size: 1rem;
+  }
+
+  .movie-item .meta {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    margin-top: 2px;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .pill.to-watch { background: var(--blue-light); color: var(--blue-deep); }
+  .pill.watched { background: var(--blue-strong); color: var(--white); }
+
+  .stars { color: var(--blue-strong); font-size: 0.9rem; }
+
+  .review-text {
+    font-size: 0.88rem;
+    color: var(--text);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .actions button { font-size: 0.78rem; padding: 5px 10px; }
+
+  .empty {
+    text-align: center;
+    color: var(--text-soft);
+    padding: 24px 0;
+    font-size: 0.9rem;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .stat-box {
+    background: var(--blue-pale);
+    border-radius: 8px;
+    text-align: center;
+    padding: 12px 6px;
+  }
+
+  .stat-box .num {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--blue-deep);
+  }
+
+  .stat-box .lbl {
+    font-size: 0.75rem;
+    color: var(--text-soft);
+  }
+
+  .genre-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--blue-light);
+    font-size: 0.9rem;
+  }
+
+  .genre-row:last-child { border-bottom: none; }
+
+  .error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+
+  .hidden { display: none; }
+
+  dialog {
+    border: none;
+    border-radius: var(--radius);
+    padding: 20px;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  }
+
+  dialog::backdrop { background: rgba(28, 74, 110, 0.35); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 Movie Watchlist &amp; Review Portal</h1>
+  <p>Track what to watch, rate what you've seen.</p>
+</header>
+
+<main>
+
+  <!-- AUTH SCREEN -->
+  <section id="authScreen">
+    <div class="card">
+      <div class="tabs">
+        <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Log In</button>
+        <button id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <div id="loginForm">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" placeholder="Enter your username">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="Enter your password">
+        <button class="btn" onclick="handleLogin()">Log In</button>
+        <div class="error" id="loginError"></div>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <label for="regUser">Choose a username</label>
+        <input type="text" id="regUser" placeholder="e.g. moviefan22">
+        <label for="regPass">Choose a password</label>
+        <input type="password" id="regPass" placeholder="At least 4 characters">
+        <button class="btn" onclick="handleRegister()">Create Account</button>
+        <div class="error" id="regError"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP SCREEN -->
+  <section id="appScreen" class="hidden">
+
+    <div class="topbar">
+      <span id="welcomeText"></span>
+      <button class="btn secondary" onclick="handleLogout()">Log Out</button>
+    </div>
+
+    <div class="tabs">
+      <button id="tabList" class="active" onclick="switchAppTab('list')">Watchlist</button>
+      <button id="tabAnalytics" onclick="switchAppTab('analytics')">Analytics</button>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="listView">
+      <div class="card">
+        <h2>Add a Movie</h2>
+        <div class="row">
+          <div>
+            <label for="newTitle">Title</label>
+            <input type="text" id="newTitle" placeholder="e.g. Interstellar">
+          </div>
+          <div>
+            <label for="newGenre">Genre</label>
+            <input type="text" id="newGenre" placeholder="e.g. Sci-Fi">
+          </div>
+        </div>
+        <button class="btn" onclick="handleAddMovie()">Add to Watchlist</button>
+        <div class="error" id="addError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Your Movies</h2>
+        <div id="movieList"></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div id="analyticsView" class="hidden">
+      <div class="card">
+        <h2>Overview</h2>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="num" id="statTotal">0</div><div class="lbl">Total Movies</div></div>
+          <div class="stat-box"><div class="num" id="statWatched">0</div><div class="lbl">Watched</div></div>
+          <div class="stat-box"><div class="num" id="statToWatch">0</div><div class="lbl">To Watch</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Genre-wise Average Rating</h2>
+        <div id="genreStats"></div>
+      </div>
+
+      <div class="card">
+        <h2>Watched History</h2>
+        <div id="watchedHistory"></div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Rate & Review Dialog -->
+<dialog id="rateDialog">
+  <h2 style="margin-top:0; color:var(--blue-deep); font-size:1rem;">Rate &amp; Review</h2>
+  <label for="rateStars">Rating (1-5)</label>
+  <select id="rateStars">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5" selected>5</option>
+  </select>
+  <label for="rateReview">Review (optional)</label>
+  <textarea id="rateReview" placeholder="What did you think?"></textarea>
+  <div class="actions">
+    <button class="btn" onclick="submitRating()">Save</button>
+    <button class="btn secondary" onclick="closeRateDialog()">Cancel</button>
+  </div>
+</dialog>
+
+<script>
+  // ---------- Storage helpers (per-browser, via localStorage) ----------
+  const STORAGE_KEY = 'movieWatchlistUsers';
+
+  function loadUsers() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveUsers(users) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+    } catch (e) {
+      // storage unavailable — app still works for this session
+    }
+  }
+
+  let users = loadUsers();
+  let currentUsername = null;
+  let ratingTargetIndex = null;
+
+  // ---------- Auth screen ----------
+
+  function switchAuthTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('regError').textContent = '';
+  }
+
+  function handleRegister() {
+    const username = document.getElementById('regUser').value.trim();
+    const password = document.getElementById('regPass').value;
+    const errEl = document.getElementById('regError');
+
+    if (!username || !password) {
+      errEl.textContent = 'Please fill in both fields.';
+      return;
+    }
+    if (password.length < 4) {
+      errEl.textContent = 'Password must be at least 4 characters.';
+      return;
+    }
+    if (users[username]) {
+      errEl.textContent = 'That username is already taken.';
+      return;
+    }
+
+    users[username] = { password, movies: [] };
+    saveUsers(users);
+    errEl.textContent = '';
+    document.getElementById('regUser').value = '';
+    document.getElementById('regPass').value = '';
+    switchAuthTab('login');
+    document.getElementById('loginError').textContent = 'Account created — please log in.';
+  }
+
+  function handleLogin() {
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const errEl = document.getElementById('loginError');
+
+    const user = users[username];
+    if (!user || user.password !== password) {
+      errEl.textContent = 'Incorrect username or password.';
+      return;
+    }
+
+    currentUsername = username;
+    errEl.textContent = '';
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    enterApp();
+  }
+
+  function handleLogout() {
+    currentUsername = null;
+    document.getElementById('appScreen').classList.add('hidden');
+    document.getElementById('authScreen').classList.remove('hidden');
+    switchAuthTab('login');
+  }
+
+  // ---------- App screen ----------
+
+  function enterApp() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('welcomeText').textContent = 'Signed in as ' + currentUsername;
+    switchAppTab('list');
+    renderMovies();
+  }
+
+  function switchAppTab(tab) {
+    document.getElementById('tabList').classList.toggle('active', tab === 'list');
+    document.getElementById('tabAnalytics').classList.toggle('active', tab === 'analytics');
+    document.getElementById('listView').classList.toggle('hidden', tab !== 'list');
+    document.getElementById('analyticsView').classList.toggle('hidden', tab !== 'analytics');
+    if (tab === 'analytics') renderAnalytics();
+  }
+
+  function currentMovies() {
+    return users[currentUsername].movies;
+  }
+
+  function persist() {
+    saveUsers(users);
+  }
+
+  // ---------- Watchlist CRUD ----------
+
+  function handleAddMovie() {
+    const titleEl = document.getElementById('newTitle');
+    const genreEl = document.getElementById('newGenre');
+    const errEl = document.getElementById('addError');
+
+    const title = titleEl.value.trim();
+    const genre = genreEl.value.trim();
+
+    if (!title || !genre) {
+      errEl.textContent = 'Please enter both a title and a genre.';
+      return;
+    }
+
+    currentMovies().push({ title, genre, status: 'TO_WATCH', rating: 0, review: '' });
+    persist();
+    titleEl.value = '';
+    genreEl.value = '';
+    errEl.textContent = '';
+    renderMovies();
+  }
+
+  function toggleStatus(index) {
+    const movie = currentMovies()[index];
+    movie.status = movie.status === 'TO_WATCH' ? 'WATCHED' : 'TO_WATCH';
+    if (movie.status === 'TO_WATCH') {
+      movie.rating = 0;
+      movie.review = '';
+    }
+    persist();
+    renderMovies();
+  }
+
+  function deleteMovie(index) {
+    currentMovies().splice(index, 1);
+    persist();
+    renderMovies();
+  }
+
+  function openRateDialog(index) {
+    ratingTargetIndex = index;
+    const movie = currentMovies()[index];
+    document.getElementById('rateStars').value = movie.rating > 0 ? movie.rating : 5;
+    document.getElementById('rateReview').value = movie.review || '';
+    document.getElementById('rateDialog').showModal();
+  }
+
+  function closeRateDialog() {
+    document.getElementById('rateDialog').close();
+    ratingTargetIndex = null;
+  }
+
+  function submitRating() {
+    if (ratingTargetIndex === null) return;
+    const movie = currentMovies()[ratingTargetIndex];
+    movie.rating = parseInt(document.getElementById('rateStars').value, 10);
+    movie.review = document.getElementById('rateReview').value.trim();
+    persist();
+    closeRateDialog();
+    renderMovies();
+  }
+
+  function renderMovies() {
+    const container = document.getElementById('movieList');
+    const movies = currentMovies();
+
+    if (movies.length === 0) {
+      container.innerHTML = '<div class="empty">No movies yet — add one above to get started.</div>';
+      return;
+    }
+
+    container.innerHTML = movies.map((m, i) => {
+      const pillClass = m.status === 'WATCHED' ? 'watched' : 'to-watch';
+      const pillLabel = m.status === 'WATCHED' ? 'Watched' : 'To Watch';
+      const stars = m.rating > 0 ? '★'.repeat(m.rating) + '☆'.repeat(5 - m.rating) : '';
+      const review = m.review ? '<div class="review-text">"' + escapeHtml(m.review) + '"</div>' : '';
+
+      return `
+        <div class="movie-item">
+          <div class="title">${escapeHtml(m.title)}</div>
+          <div class="meta">${escapeHtml(m.genre)} &middot; <span class="pill ${pillClass}">${pillLabel}</span>
+            ${stars ? ' &middot; <span class="stars">' + stars + '</span>' : ''}
+          </div>
+          ${review}
+          <div class="actions">
+            <button class="btn secondary" onclick="toggleStatus(${i})">
+              Mark as ${m.status === 'WATCHED' ? 'To Watch' : 'Watched'}
+            </button>
+            ${m.status === 'WATCHED' ? `<button class="btn secondary" onclick="openRateDialog(${i})">Rate & Review</button>` : ''}
+            <button class="btn danger" onclick="deleteMovie(${i})">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------- Analytics ----------
+
+  function renderAnalytics() {
+    const movies = currentMovies();
+    const watched = movies.filter(m => m.status === 'WATCHED');
+    const toWatch = movies.length - watched.length;
+
+    document.getElementById('statTotal').textContent = movies.length;
+    document.getElementById('statWatched').textContent = watched.length;
+    document.getElementById('statToWatch').textContent = toWatch;
+
+    // Genre-wise average rating
+    const genreTotals = {};
+    const genreCounts = {};
+    watched.forEach(m => {
+      if (m.rating > 0) {
+        genreTotals[m.genre] = (genreTotals[m.genre] || 0) + m.rating;
+        genreCounts[m.genre] = (genreCounts[m.genre] || 0) + 1;
+      }
+    });
+
+    const genreStatsEl = document.getElementById('genreStats');
+    const genres = Object.keys(genreTotals);
+    if (genres.length === 0) {
+      genreStatsEl.innerHTML = '<div class="empty">No ratings yet.</div>';
+    } else {
+      genreStatsEl.innerHTML = genres.map(g => {
+        const avg = (genreTotals[g] / genreCounts[g]).toFixed(1);
+        return `<div class="genre-row"><span>${escapeHtml(g)}</span><span>${avg}/5 (${genreCounts[g]} rated)</span></div>`;
+      }).join('');
+    }
+
+    // Watched history
+    const historyEl = document.getElementById('watchedHistory');
+    if (watched.length === 0) {
+      historyEl.innerHTML = '<div class="empty">Nothing watched yet.</div>';
+    } else {
+      historyEl.innerHTML = watched.map(m => {
+        const stars = m.rating > 0 ? '★'.repeat(m.rating) + '☆'.repeat(5 - m.rating) : 'Not rated';
+        return `<div class="genre-row"><span>${escapeHtml(m.title)} (${escapeHtml(m.genre)})</span><span class="stars">${stars}</span></div>`;
+      }).join('');
+    }
+  }
+
+  // Allow pressing Enter to submit auth forms
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  document.getElementById('regPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
+</script>
+
+</body>
+</html>
